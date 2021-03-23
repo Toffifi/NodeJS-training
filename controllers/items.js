@@ -33,11 +33,15 @@ export const get = (req, res) => {
 };
 
 export const update = (req, res) => {
-  const item = updateItem(req.params.id, req.body);
+  if (req.body.price && req.body.name) {
+    const item = updateItem(req.params.id, req.body);
 
-  if (!item) {
-    res.status(404);
+    if (!item) {
+      res.status(404);
+    }
+
+    res.status(202).json(item);
+  } else {
+    res.status(400);
   }
-
-  res.status(202).json(item);
 };
