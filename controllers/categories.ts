@@ -1,14 +1,14 @@
 import express from 'express';
-import { mockData, deleteItem, updateItem } from '../data/mockData.js';
+import { mockData, deleteItem, updateItem } from '../data/mockData';
 
 export const getAll = (req: express.Request, res: express.Response): void => {
   res.json(mockData.categories);
 };
 
-export const create = (req: express.Request, res: express.Response) => {
+export const create = async (req: express.Request, res: express.Response) => {
   if (req.body.price && req.body.name) {
     const newItem = {
-      id: Number(Date.now()),
+      id: Date.now().toString(),
       ...req.body,
     };
     mockData.categories.push(newItem);

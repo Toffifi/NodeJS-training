@@ -1,5 +1,7 @@
+import { ObjectId } from 'mongodb';
+
 export interface Item {
-  id: string;
+  _id?: ObjectId;
   name: string;
   price: number;
   categoryId: string;
