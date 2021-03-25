@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { getAll, create, remove, get, update } from '../controllers/items.js';
+import { getAll, create, remove, get, update } from '../controllers/items';
 
-const router = Router();
+const router: Router = Router();
 
 router.get('/items', getAll);
 router.get('/items/:id', get);

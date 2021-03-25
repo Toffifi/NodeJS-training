@@ -1,16 +1,17 @@
-import { mockData, deleteItem, updateItem } from '../data/mockData.js';
+import { mockData, deleteItem, updateItem } from '../data/mockData';
+import { Item } from '../interfaces';
 
 export const getAll = (req, res) => {
-  res.json(mockData);
+  res.json(mockData.items);
 };
 
 export const create = (req, res) => {
   if (req.body.price && req.body.name) {
-    const newItem = {
+    const newItem: Item = {
       id: Date.now().toString(),
       ...req.body,
     };
-    mockData.push(newItem);
+    mockData.items.push(newItem);
     res.status(201).json(newItem);
   } else {
     res.status(400);
@@ -23,7 +24,7 @@ export const remove = (req, res) => {
 };
 
 export const get = (req, res) => {
-  const item = mockData.find((item) => item.id === req.params.id);
+  const item = mockData.items.find((i) => i.id === req.params.id);
 
   if (!item) {
     res.status(404);
@@ -34,7 +35,7 @@ export const get = (req, res) => {
 
 export const update = (req, res) => {
   if (req.body.price && req.body.name) {
-    const item = updateItem(req.params.id, req.body);
+    const item: Item | null = updateItem(req.params.id, req.body);
 
     if (!item) {
       res.status(404);
