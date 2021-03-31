@@ -1,9 +1,7 @@
 import { ObjectId } from 'mongodb';
 
-export interface Item {
+export interface Category {
   _id?: ObjectId;
   name: string;
-  price: number;
-  categoryId: string;
   isDeleted: boolean;
 }

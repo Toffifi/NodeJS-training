@@ -1,4 +1,4 @@
-import { Item, MockData } from '../interfaces';
+import { MockData } from '../interfaces';
 
 export let mockData: MockData = {
   items: [
@@ -37,23 +37,4 @@ export let mockData: MockData = {
       name: 'Eyes',
     },
   ],
-};
-
-export const deleteItem = (id: string): void => {
-  mockData.items = mockData.items.filter((item) => item.id !== id);
-};
-
-export const updateItem = (
-  id: string,
-  req: { name: string; price: number }
-): Item | null => {
-  const item = mockData.items.find((i: Item) => i.id === id);
-
-  if (!item) {
-    return null;
-  }
-
-  item.name = req.name;
-  item.price = req.price;
-  return item;
 };

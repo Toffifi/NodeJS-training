@@ -1,12 +1,13 @@
 import { Router } from 'express';
-import { getAll, create, remove, get, update } from '../controllers/categories';
 
-const router: Router = Router();
+import { create, get, getAll, remove, update } from '../controllers/categories';
 
-router.get('/categories', getAll);
-router.get('/categories/:id', get);
-router.post('/categories', create);
-router.put('/categories/:id', update);
-router.delete('/categories/:id', remove);
+const createCategoryRoutes = (router: Router) => {
+  router.get('/categories', getAll);
+  router.get('/categories/:id', get);
+  router.post('/categories', create);
+  router.put('/categories/:id', update);
+  router.delete('/categories/:id', remove);
+};
 
-export default router;
+export default createCategoryRoutes;

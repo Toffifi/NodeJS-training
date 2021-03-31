@@ -1,17 +1,58 @@
-import { MongoClient } from 'mongodb';
-import { Item } from './models/item';
+import { FilterQuery, MongoClient, OptionalId, WithId } from 'mongodb';
 
-const mongoClient = new MongoClient('mongodb://localhost:27017/', {
-  useUnifiedTopology: true,
-});
+import { Collections } from './enums/collections';
 
-const itemsCollection = () =>
-  mongoClient.db('makeupStoreDb').collection<Item>('items');
-const categoryCollection = () =>
-  mongoClient.db('makeupStoreDb').collection('categories');
+let mongoClient: MongoClient;
 
-const connect = () => mongoClient.connect();
+const initialize = () => {
+  mongoClient = new MongoClient('mongodb://localhost:27017/', {
+    useUnifiedTopology: true,
+  });
 
-const closeConnection = () => mongoClient.close();
+  mongoClient.connect();
+};
 
-export { connect, closeConnection, itemsCollection, categoryCollection };
+const add = async <T>(
+  collection: Collections,
+  item: OptionalId<T>
+): Promise<WithId<T>> => {
+  try {
+    const newItem = await mongoClient
+      .db('makeupStoreDb')
+      .collection<T>(collection)
+      .insertOne(item);
+    return newItem.ops.length ? newItem.ops[0] : null;
+  } catch {
+    return null;
+  }
+};
+
+const getOne = async <T>(
+  collection: Collections,
+  query: FilterQuery<T>
+): Promise<T> => {
+  try {
+    const items = await get(collection, query);
+
+    return items.length ? items[0] : null;
+  } catch {
+    return null;
+  }
+};
+
+const get = async <T>(
+  collection: Collections,
+  query: FilterQuery<T>
+): Promise<T[]> => {
+  try {
+    return await mongoClient
+      .db('makeupStoreDb')
+      .collection<T>(collection)
+      .find(query)
+      .toArray();
+  } catch {
+    return null;
+  }
+};
+
+export { initialize, add, get, getOne };
