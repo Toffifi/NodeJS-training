@@ -1,5 +1,11 @@
 import { Category } from 'data/models/category';
-import { FilterQuery, ObjectId, OptionalId, WithId } from 'mongodb';
+import {
+  FilterQuery,
+  MatchKeysAndValues,
+  ObjectId,
+  OptionalId,
+  WithId,
+} from 'mongodb';
 
 import { Collections } from '../data/enums/collections';
 import * as dbClient from '../data/makeupStoreClient';
@@ -93,6 +99,74 @@ export const create = async (
   };
 };
 
-export const update = () => {};
+export const update = async (
+  id: string,
+  name: string,
+  categoryId: string,
+  price: number
+) => {
+  if (!price || !name || !categoryId || !id) {
+    return {
+      isSuccessful: false,
+      error: 'Bad request',
+    };
+  }
 
-export const remove = (id: number) => {};
+  const category = await dbClient.getOne<Category>(Collections.Categories, {
+    _id: new ObjectId(categoryId),
+    isDeleted: false,
+  });
+
+  if (!category) {
+    return {
+      isSuccessful: false,
+      error: 'Category not found',
+    };
+  }
+
+  const updatedItem: MatchKeysAndValues<Item> = {
+    name,
+    categoryId,
+    price,
+  };
+  const result = await dbClient.update<Item>(
+    Collections.Items,
+    {
+      _id: new ObjectId(id),
+      isDeleted: false,
+    },
+    updatedItem
+  );
+
+  if (!result && !result.result.ok) {
+    return {
+      isSuccessful: false,
+      error: 'Error while updating item',
+    };
+  }
+
+  return {
+    isSuccessful: true,
+  };
+};
+
+export const remove = async (id: string) => {
+  const result = await dbClient.update<Item>(
+    Collections.Items,
+    {
+      _id: new ObjectId(id),
+    },
+    { isDeleted: true }
+  );
+
+  if (!result && !result.result.ok) {
+    return {
+      isSuccessful: false,
+      error: 'Error while deleting item',
+    };
+  }
+
+  return {
+    isSuccessful: true,
+  };
+};

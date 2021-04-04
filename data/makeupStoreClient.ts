@@ -1,4 +1,11 @@
-import { FilterQuery, MongoClient, OptionalId, WithId } from 'mongodb';
+import {
+  FilterQuery,
+  MatchKeysAndValues,
+  MongoClient,
+  OptionalId,
+  UpdateWriteOpResult,
+  WithId,
+} from 'mongodb';
 
 import { Collections } from './enums/collections';
 
@@ -10,6 +17,10 @@ const initialize = () => {
   });
 
   mongoClient.connect();
+};
+
+const close = () => {
+  mongoClient.close();
 };
 
 const add = async <T>(
@@ -55,4 +66,22 @@ const get = async <T>(
   }
 };
 
-export { initialize, add, get, getOne };
+const update = async <T>(
+  collection: Collections,
+  query: FilterQuery<T>,
+  updateQuery: MatchKeysAndValues<T>
+): Promise<UpdateWriteOpResult> => {
+  try {
+    const updateResult = await mongoClient
+      .db('makeupStoreDb')
+      .collection<T>(collection)
+      .updateOne(query, {
+        $set: updateQuery,
+      });
+    return updateResult;
+  } catch {
+    return null;
+  }
+};
+
+export { initialize, close, add, get, getOne, update };

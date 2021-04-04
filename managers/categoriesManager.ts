@@ -1,5 +1,11 @@
 import { Result } from 'interfaces/result';
-import { FilterQuery, ObjectId, OptionalId, WithId } from 'mongodb';
+import {
+  FilterQuery,
+  MatchKeysAndValues,
+  ObjectId,
+  OptionalId,
+  WithId,
+} from 'mongodb';
 
 import { Collections } from '../data/enums/collections';
 import * as dbClient from '../data/makeupStoreClient';
@@ -86,5 +92,58 @@ export const create = async (
   return {
     isSuccessful: true,
     data: newCategory,
+  };
+};
+
+export const update = async (id: string, name: string) => {
+  if (!name || !id) {
+    return {
+      isSuccessful: false,
+      error: 'Bad request',
+    };
+  }
+
+  const updatedCategory: MatchKeysAndValues<Category> = {
+    name,
+  };
+  const result = await dbClient.update<Category>(
+    Collections.Categories,
+    {
+      _id: new ObjectId(id),
+      isDeleted: false,
+    },
+    updatedCategory
+  );
+
+  if (!result && !result.result.ok) {
+    return {
+      isSuccessful: false,
+      error: 'Error while updating category',
+    };
+  }
+
+  return {
+    isSuccessful: true,
+  };
+};
+
+export const remove = async (id: string) => {
+  const result = await dbClient.update<Category>(
+    Collections.Categories,
+    {
+      _id: new ObjectId(id),
+    },
+    { isDeleted: true }
+  );
+
+  if (!result && !result.result.ok) {
+    return {
+      isSuccessful: false,
+      error: 'Error while deleting category',
+    };
+  }
+
+  return {
+    isSuccessful: true,
   };
 };

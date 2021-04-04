@@ -24,10 +24,18 @@ export const create = async (req: express.Request, res: express.Response) => {
   res.status(201).json(result.data);
 };
 
-// export const remove = (req: express.Request, res: express.Response): void => {
-//   deleteItem(req.params.id);
-//   res.status(204).json({ message: 'Item has been removed.' });
-// };
+export const remove = async (
+  req: express.Request,
+  res: express.Response
+): Promise<void> => {
+  const result = await manager.remove(req.params.id);
+
+  if (!result.isSuccessful) {
+    res.status(400).json(result.error);
+  }
+
+  res.status(204).json();
+};
 
 export const get = async (
   req: express.Request,
@@ -42,16 +50,12 @@ export const get = async (
   res.status(201).json(result.data);
 };
 
-// export const update = (req: express.Request, res: express.Response): void => {
-//   if (req.body.price && req.body.name) {
-//     const item = updateItem(req.params.id, req.body);
+export const update = async (req: express.Request, res: express.Response) => {
+  const result = await manager.update(req.body.id, req.body.name);
 
-//     if (!item) {
-//       res.status(404);
-//     }
+  if (!result.isSuccessful) {
+    res.status(400).json(result.error);
+  }
 
-//     res.status(202).json(item);
-//   } else {
-//     res.status(400);
-//   }
-// };
+  res.status(200).json();
+};

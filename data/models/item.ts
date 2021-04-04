@@ -1,7 +1,6 @@
-import { ObjectId } from 'mongodb';
+import { BaseModel } from './baseModel';
 
-export interface Item {
-  _id?: ObjectId;
+export interface Item extends BaseModel {
   name: string;
   price: number;
   categoryId: string;

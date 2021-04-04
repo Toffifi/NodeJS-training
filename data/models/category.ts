@@ -1,7 +1,6 @@
-import { ObjectId } from 'mongodb';
+import { BaseModel } from './baseModel';
 
-export interface Category {
-  _id?: ObjectId;
+export interface Category extends BaseModel {
   name: string;
   isDeleted: boolean;
 }
