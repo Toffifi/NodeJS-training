@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { create, get, getAll, update, remove } from '../controllers/categories';
+import { create, get, getAll, remove, update } from '../controllers/categories';
 
 const createCategoryRoutes = (router: Router) => {
   router.get('/categories', getAll);

@@ -1,8 +1,10 @@
 import dotenv from 'dotenv';
 import express from 'express';
+import swaggerUi from 'swagger-ui-express';
 
 import * as mongoClient from './data/makeupStoreClient';
 import router from './routes';
+import * as swaggerDocument from './swagger.json';
 
 dotenv.config();
 
@@ -13,6 +15,8 @@ mongoClient.initialize();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(router);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app
   .listen(PORT, () => {

@@ -1,6 +1,6 @@
 import { Router } from 'express';
 
-import { create, get, getAll, update, remove } from '../controllers/items';
+import { create, get, getAll, remove, update } from '../controllers/items';
 
 const createItemRoutes = (router: Router) => {
   router.get('/items', getAll);
