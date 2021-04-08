@@ -1,0 +1,318 @@
+openapi: 3.0.1
+info:
+  title: Makeup store API
+  version: v1
+servers:
+  - url: "http://localhost:4000"
+tags:
+  - name: items
+    description: All items in store
+  - name: categories
+    description: All categories in store
+paths:
+  /items:
+    get:
+      summary: Get all items
+      tags:
+        - items
+      parameters:
+        - name: categoryId
+          in: query
+          required: false
+          description: Category ID for getting all items from specific category
+          schema:
+            type: string
+            example: 606399ce6f821b49b0e340b6
+      responses:
+        "200":
+          description: OK
+          content:
+            document:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/item"
+        "400":
+          description: Bad request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+    post:
+      summary: Add a new item to the store
+      tags:
+        - items
+      requestBody:
+        description: Item object that needs to be added to the store
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/postItem"
+      responses:
+        "201":
+          description: OK
+          content:
+            document:
+              schema:
+                $ref: "#/components/schemas/item"
+        "400":
+          description: Bad request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+    put:
+      summary: Update an existing item
+      tags:
+        - items
+      requestBody:
+        description: Item object that needs to be updated
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/putItem"
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  "/items/{id}":
+    get:
+      summary: Get one item
+      tags:
+        - items
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Item's id
+          schema:
+            type: string
+            example: 60643ec32935b839bc005adc
+      responses:
+        "200":
+          description: OK
+          content:
+            document:
+              schema:
+                $ref: "#/components/schemas/item"
+        "400":
+          description: Bad request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+    delete:
+      summary: Delete an existing item
+      tags:
+        - items
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Item's id
+          schema:
+            type: string
+            example: 60643ec32935b839bc005adc
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  /categories:
+    get:
+      summary: Get all categories
+      tags:
+        - categories
+      responses:
+        "200":
+          description: OK
+          content:
+            document:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/category"
+        "400":
+          description: Bad request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+    post:
+      summary: Add a new category to the store
+      tags:
+        - categories
+      requestBody:
+        description: Category object that needs to be added to the store
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/postCategory"
+      responses:
+        "201":
+          description: OK
+          content:
+            document:
+              schema:
+                $ref: "#/components/schemas/category"
+        "400":
+          description: Bad request
+        "404":
+          description: Not Found
+        "409":
+          description: Category with this name already exists
+        "500":
+          description: Internal Server Error
+    put:
+      summary: Update an existing category
+      tags:
+        - categories
+      requestBody:
+        description: Category object that needs to be updated
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/putCategory"
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+  "/categories/{id}":
+    get:
+      summary: Get one category
+      tags:
+        - categories
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category's id
+          schema:
+            type: string
+            example: 606399ce6f821b49b0e340b6
+      responses:
+        "200":
+          description: OK
+          content:
+            document:
+              schema:
+                $ref: "#/components/schemas/category"
+        "400":
+          description: Bad request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+    delete:
+      summary: Delete an existing category
+      tags:
+        - categories
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Category's id
+          schema:
+            type: string
+            example: 606399ce6f821b49b0e340b6
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Bad request
+        "404":
+          description: Not Found
+        "500":
+          description: Internal Server Error
+components:
+  schemas:
+    item:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 60643ec32935b839bc005adc
+        name:
+          type: string
+          example: Best mascara
+        price:
+          type: number
+          example: "10.00"
+        categoryId:
+          type: string
+          example: 606399ce6f821b49b0e340b6
+        isDeleted:
+          type: boolean
+          example: "false"
+    postItem:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Best mascara
+        price:
+          type: number
+          example: "10.00"
+        categoryId:
+          type: string
+          example: 606399ce6f821b49b0e340b6
+    putItem:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 60643ec32935b839bc005adc
+        name:
+          type: string
+          example: Best mascara
+        price:
+          type: number
+          example: "10.00"
+        categoryId:
+          type: string
+          example: 606399ce6f821b49b0e340b6
+    category:
+      type: object
+      properties:
+        _id:
+          type: string
+          example: 606399ce6f821b49b0e340b6
+        name:
+          type: string
+          example: Mascara
+        isDeleted:
+          type: boolean
+          example: "false"
+    postCategory:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Mascara
+    putCategory:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 606399ce6f821b49b0e340b6
+        name:
+          type: string
+          example: Mascara
