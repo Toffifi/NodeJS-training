@@ -37,12 +37,6 @@ export const getAll = async (categoryId: string) => {
 };
 
 export const getById = async (id: string): Promise<Result<Item>> => {
-  if (!id) {
-    return {
-      isSuccessful: false,
-      error: 'Bad request',
-    };
-  }
   const item = await dbClient.getOne<Item>(Collections.Items, {
     _id: new ObjectId(id),
     isDeleted: false,
@@ -59,13 +53,6 @@ export const create = async (
   categoryId: string,
   price: number
 ): Promise<Result<WithId<Item>>> => {
-  if (!price || !name || !categoryId) {
-    return {
-      isSuccessful: false,
-      error: 'Bad request',
-    };
-  }
-
   const category = await dbClient.getOne<Category>(Collections.Categories, {
     _id: new ObjectId(categoryId),
     isDeleted: false,
@@ -105,13 +92,6 @@ export const update = async (
   categoryId: string,
   price: number
 ) => {
-  if (!price || !name || !categoryId || !id) {
-    return {
-      isSuccessful: false,
-      error: 'Bad request',
-    };
-  }
-
   const category = await dbClient.getOne<Category>(Collections.Categories, {
     _id: new ObjectId(categoryId),
     isDeleted: false,
