@@ -7,6 +7,7 @@ import {
   WithId,
 } from 'mongodb';
 
+import { NotFoundError, ServerError } from '../errors';
 import { Collections } from './enums/collections';
 
 let mongoClient: MongoClient;
@@ -32,9 +33,13 @@ const add = async <T>(
       .db('makeupStoreDb')
       .collection<T>(collection)
       .insertOne(item);
-    return newItem.ops.length ? newItem.ops[0] : null;
+    if (newItem.ops.length) {
+      return newItem.ops[0];
+    } else {
+      throw new NotFoundError();
+    }
   } catch {
-    return null;
+    throw new ServerError();
   }
 };
 
@@ -44,10 +49,13 @@ const getOne = async <T>(
 ): Promise<T> => {
   try {
     const items = await get(collection, query);
-
-    return items.length ? items[0] : null;
+    if (items.length) {
+      return items[0];
+    } else {
+      throw new NotFoundError();
+    }
   } catch {
-    return null;
+    throw new ServerError();
   }
 };
 
@@ -62,7 +70,7 @@ const get = async <T>(
       .find(query)
       .toArray();
   } catch {
-    return null;
+    throw new ServerError();
   }
 };
 
@@ -80,7 +88,7 @@ const update = async <T>(
       });
     return updateResult;
   } catch {
-    return null;
+    throw new ServerError();
   }
 };
 

@@ -1,8 +1,7 @@
 import { Router } from 'express';
+import { ValidateFunction, Validator } from 'express-json-validator-middleware';
 
 import { create, get, getAll, remove, update } from '../controllers/categories';
-
-import { ValidateFunction, Validator } from 'express-json-validator-middleware';
 import {
   GetCategorySchema,
   PostCategorySchema,

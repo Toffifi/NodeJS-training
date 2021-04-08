@@ -10,7 +10,7 @@ import {
 import { Collections } from '../data/enums/collections';
 import * as dbClient from '../data/makeupStoreClient';
 import { Item } from '../data/models/item';
-import { Result } from '../interfaces/result';
+import { NotFoundError } from '../errors';
 
 export const getAll = async (categoryId: string) => {
   const query: FilterQuery<Item> = {
@@ -21,48 +21,36 @@ export const getAll = async (categoryId: string) => {
     query.categoryId = categoryId;
   }
 
-  const items = await dbClient.get<Item>(Collections.Items, query);
-
-  if (!items) {
-    return {
-      isSuccessful: false,
-      error: 'Error while getting all items',
-    };
+  try {
+    return await dbClient.get<Item>(Collections.Items, query);
+  } catch {
+    throw new NotFoundError();
   }
-
-  return {
-    isSuccessful: true,
-    data: items,
-  };
 };
 
-export const getById = async (id: string): Promise<Result<Item>> => {
-  const item = await dbClient.getOne<Item>(Collections.Items, {
-    _id: new ObjectId(id),
-    isDeleted: false,
-  });
-
-  return {
-    isSuccessful: true,
-    data: item,
-  };
+export const getById = async (id: string): Promise<Item> => {
+  try {
+    return await dbClient.getOne<Item>(Collections.Items, {
+      _id: new ObjectId(id),
+      isDeleted: false,
+    });
+  } catch {
+    throw new NotFoundError();
+  }
 };
 
 export const create = async (
   name: string,
   categoryId: string,
   price: number
-): Promise<Result<WithId<Item>>> => {
-  const category = await dbClient.getOne<Category>(Collections.Categories, {
-    _id: new ObjectId(categoryId),
-    isDeleted: false,
-  });
-
-  if (!category) {
-    return {
-      isSuccessful: false,
-      error: 'Category not found',
-    };
+): Promise<WithId<Item>> => {
+  try {
+    dbClient.getOne<Category>(Collections.Categories, {
+      _id: new ObjectId(categoryId),
+      isDeleted: false,
+    });
+  } catch {
+    throw new NotFoundError();
   }
 
   const item: OptionalId<Item> = {
@@ -71,19 +59,7 @@ export const create = async (
     price,
     isDeleted: false,
   };
-  const newItem = await dbClient.add<Item>(Collections.Items, item);
-
-  if (!newItem) {
-    return {
-      isSuccessful: false,
-      error: 'Error while saving new item',
-    };
-  }
-
-  return {
-    isSuccessful: true,
-    data: newItem,
-  };
+  return await dbClient.add<Item>(Collections.Items, item);
 };
 
 export const update = async (
@@ -92,16 +68,13 @@ export const update = async (
   categoryId: string,
   price: number
 ) => {
-  const category = await dbClient.getOne<Category>(Collections.Categories, {
-    _id: new ObjectId(categoryId),
-    isDeleted: false,
-  });
-
-  if (!category) {
-    return {
-      isSuccessful: false,
-      error: 'Category not found',
-    };
+  try {
+    await dbClient.getOne<Category>(Collections.Categories, {
+      _id: new ObjectId(categoryId),
+      isDeleted: false,
+    });
+  } catch {
+    throw new NotFoundError();
   }
 
   const updatedItem: MatchKeysAndValues<Item> = {
@@ -109,44 +82,31 @@ export const update = async (
     categoryId,
     price,
   };
-  const result = await dbClient.update<Item>(
-    Collections.Items,
-    {
-      _id: new ObjectId(id),
-      isDeleted: false,
-    },
-    updatedItem
-  );
 
-  if (!result && !result.result.ok) {
-    return {
-      isSuccessful: false,
-      error: 'Error while updating item',
-    };
+  try {
+    return await dbClient.update<Item>(
+      Collections.Items,
+      {
+        _id: new ObjectId(id),
+        isDeleted: false,
+      },
+      updatedItem
+    );
+  } catch {
+    throw new NotFoundError();
   }
-
-  return {
-    isSuccessful: true,
-  };
 };
 
 export const remove = async (id: string) => {
-  const result = await dbClient.update<Item>(
-    Collections.Items,
-    {
-      _id: new ObjectId(id),
-    },
-    { isDeleted: true }
-  );
-
-  if (!result && !result.result.ok) {
-    return {
-      isSuccessful: false,
-      error: 'Error while deleting item',
-    };
+  try {
+    return await dbClient.update<Item>(
+      Collections.Items,
+      {
+        _id: new ObjectId(id),
+      },
+      { isDeleted: true }
+    );
+  } catch {
+    throw new NotFoundError();
   }
-
-  return {
-    isSuccessful: true,
-  };
 };

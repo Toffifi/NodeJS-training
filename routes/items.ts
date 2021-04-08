@@ -1,10 +1,10 @@
 import { Router } from 'express';
+import { ValidateFunction, Validator } from 'express-json-validator-middleware';
 
 import { create, get, getAll, remove, update } from '../controllers/items';
-import { ValidateFunction, Validator } from 'express-json-validator-middleware';
 import {
-  PostItemSchema,
   GetItemSchema,
+  PostItemSchema,
   PutItemSchema,
 } from '../validation/items';
 
