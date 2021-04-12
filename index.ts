@@ -4,7 +4,7 @@ import { ValidationError } from 'express-json-validator-middleware';
 import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 
-import * as mongoClient from './data/makeupStoreClient';
+import * as mongoClient from './services/makeupStoreClient';
 import router from './routes';
 
 const swaggerDocument = YAML.load('./swagger.yaml');
@@ -13,7 +13,7 @@ dotenv.config();
 
 const PORT: string = process.env.PORT || '3000';
 const app: express.Express = express();
-mongoClient.initialize();
+mongoClient.initialize(process.env.MONGO_URL, process.env.DB_NAME);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -39,6 +39,6 @@ app
     console.log(`Server has been started on port ${PORT}`);
   })
   .on('error', (err: Error) => {
-    console.log(err.message);
+    console.log('server', err.message);
     mongoClient.close();
   });

@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { ValidateFunction, Validator } from 'express-json-validator-middleware';
 
-import { create, get, getAll, remove, update } from '../controllers/items';
+import { create, get, getAll, update, remove } from '../controllers/items';
 import {
   GetItemSchema,
   PostItemSchema,
@@ -11,12 +11,12 @@ import {
 const { validate } = new Validator({ allErrors: true });
 
 const createItemRoutes = (router: Router) => {
+  router.get('/items', getAll);
   router.get(
-    '/items',
+    '/items/:id',
     validate({ body: GetItemSchema as ValidateFunction }),
-    getAll
+    get
   );
-  router.get('/items/:id', get);
   router.post(
     '/items',
     validate({ body: PostItemSchema as ValidateFunction }),
