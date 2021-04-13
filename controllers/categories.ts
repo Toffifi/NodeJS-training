@@ -5,18 +5,20 @@ import { Category } from '../interfaces';
 import { FilterQuery, MatchKeysAndValues, ObjectId, OptionalId } from 'mongodb';
 
 import * as dbClient from '../services/makeupStoreClient';
+import CategoryModel from 'models/category';
+import mongoose from 'mongoose';
 
 export const getAll = (req: express.Request, res: express.Response): void => {
-  const query: FilterQuery<Category> = {
+  CategoryModel.find({
     isDeleted: false,
-  };
-  dbClient
-    .get<Category>(Collections.Category, query)
+  })
+    .exec()
     .then((result) => {
       res.status(200).json(result);
     })
     .catch((err) => {
-      res.status(err.code).json(err.message);
+      console.log('get', err);
+      // res.status(err.code).json(err.message);
     });
 };
 
@@ -24,78 +26,79 @@ export const create = async (
   req: express.Request,
   res: express.Response
 ): Promise<void> => {
-  const existingCategories = await dbClient.get(Collections.Category, {
+  const category: Category = new CategoryModel({
     name: req.body.name,
     isDeleted: false,
   });
 
-  if (existingCategories.length) {
-    throw new ConflictError('Category with this name already exists');
-  }
-
-  const category: OptionalId<Category> = {
-    name: req.body.name,
-    isDeleted: false,
-  };
-
-  dbClient
-    .add<Category>(Collections.Category, category)
+  category
+    .save()
     .then((result) => {
-      res.status(200).json(result);
+      res.status(201).json(result);
     })
-    .catch((err) => {
-      res.status(err.code).json(err.message);
+    .catch((err: mongoose.Error) => {
+      console.log('controller', err.name);
+      // res.status(err.code).json(err.message);
     });
 };
 
 export const remove = (req: express.Request, res: express.Response): void => {
-  dbClient
-    .remove<Category>(
-      Collections.Category,
-      {
-        _id: new ObjectId(req.params.id),
-      },
-      { isDeleted: true }
-    )
-    .then((result) => {
-      res.status(200).json(result);
+  CategoryModel.updateOne(
+    {
+      _id: req.params.id,
+      isDeleted: false,
+    },
+    {
+      isDeleted: true,
+    }
+  )
+    .then(() => {
+      res.status(202).json('Item was deleted');
     })
-    .catch((err) => {
-      res.status(err.code).json(err.message);
+    .catch((err: mongoose.Error) => {
+      console.log('controller', err.name);
+      // res.status(err.code).json(err.message);
     });
 };
 
 export const get = (req: express.Request, res: express.Response): void => {
-  dbClient
-    .getOne<Category>(Collections.Category, {
-      _id: new ObjectId(req.params.id),
-      isDeleted: false,
-    })
+  getCategory(req.params.id)
     .then((result) => {
       res.status(200).json(result);
     })
     .catch((err) => {
-      res.status(err.code).json(err.message);
+      console.log('get', err);
+      // res.status(err.code).json(err.message);
     });
 };
 
 export const update = (req: express.Request, res: express.Response): void => {
-  const updatedCategory: MatchKeysAndValues<Category> = {
+  const updatedCategory: { name: string } = {
     name: req.body.name,
   };
-  dbClient
-    .update<Category>(
-      Collections.Category,
-      {
-        _id: new ObjectId(req.body.id),
-        isDeleted: false,
-      },
-      updatedCategory
-    )
-    .then((result) => {
-      res.status(200).json(result);
+
+  CategoryModel.updateOne(
+    {
+      _id: req.body.id,
+      isDeleted: false,
+    },
+    updatedCategory
+  )
+    .then(() => {
+      return getCategory(req.body.id);
     })
-    .catch((err) => {
-      res.status(err.code).json(err.message);
+    .then((result) => {
+      res.status(202).json(result);
+    })
+    .catch((err: mongoose.Error) => {
+      console.log('controller', err.name);
+      // res.status(err.code).json(err.message);
     });
+};
+
+const getCategory = (id: string): Promise<Category> => {
+  return CategoryModel.findOne({
+    _id: id,
+    isDeleted: false,
+  }).exec();
 };

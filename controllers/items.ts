@@ -74,7 +74,7 @@ export const get = (req: express.Request, res: express.Response): void => {
 };
 
 export const update = (req: express.Request, res: express.Response): void => {
-  const item: ItemUpdate = {
+  const updatedItem: ItemUpdate = {
     name: req.body.name,
     categoryId: req.body.categoryId,
     price: req.body.price,
@@ -86,7 +86,7 @@ export const update = (req: express.Request, res: express.Response): void => {
       _id: req.body.id,
       isDeleted: false,
     },
-    item
+    updatedItem
   )
     .then(() => {
       return getItem(req.body.id);
