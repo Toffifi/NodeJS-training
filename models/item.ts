@@ -1,6 +1,7 @@
-import { Collections } from '../enums/collections';
 import { Item } from 'interfaces';
 import mongoose from 'mongoose';
+
+import { Collections } from '../enums/collections';
 
 const ItemSchema = new mongoose.Schema({
   name: {

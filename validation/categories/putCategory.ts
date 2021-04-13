@@ -1,12 +1,6 @@
-export const PutCategorySchema = {
-  type: 'object',
-  required: ['id', 'name'],
-  properties: {
-    id: {
-      type: 'string',
-    },
-    name: {
-      type: 'string',
-    },
-  },
-};
+import Joi from 'joi';
+
+export const PutCategorySchema: Joi.ObjectSchema = Joi.object().keys({
+  id: Joi.string().required(),
+  name: Joi.string().required(),
+});

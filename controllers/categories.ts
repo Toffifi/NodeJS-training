@@ -1,8 +1,9 @@
 import express from 'express';
-import { errorHandler } from '../utils';
-import { Category } from '../interfaces';
 
+import { InternalError } from '../errors';
+import { Category } from '../interfaces';
 import CategoryModel from '../models/category';
+import errorHandler from '../utils/errorHandler';
 
 export const getAll = (req: express.Request, res: express.Response): void => {
   CategoryModel.find({
@@ -14,15 +15,11 @@ export const getAll = (req: express.Request, res: express.Response): void => {
     })
     .catch((err) => {
       const error = errorHandler(err);
-      console.log('getAllCategory', error);
-      res.status(error.code).json(error.message);
+      res.status(error.code).json(error);
     });
 };
 
-export const create = async (
-  req: express.Request,
-  res: express.Response
-): Promise<void> => {
+export const create = (req: express.Request, res: express.Response): void => {
   const category: Category = new CategoryModel({
     name: req.body.name,
     isDeleted: false,
@@ -35,8 +32,7 @@ export const create = async (
     })
     .catch((err) => {
       const error = errorHandler(err);
-      console.log('createCategory', error);
-      res.status(error.code).json(error.message);
+      res.status(error.code).json(error);
     });
 };
 
@@ -55,20 +51,24 @@ export const remove = (req: express.Request, res: express.Response): void => {
     })
     .catch((err) => {
       const error = errorHandler(err);
-      console.log('removeCategory', error);
-      res.status(error.code).json(error.message);
+      res.status(error.code).json(error);
     });
 };
 
 export const get = (req: express.Request, res: express.Response): void => {
   getCategory(req.params.id)
     .then((result) => {
+      if (!result) {
+        throw new InternalError(
+          `Category with id '${req.body.id}' not found`,
+          'ObjectNotFound'
+        );
+      }
       res.status(200).json(result);
     })
     .catch((err) => {
       const error = errorHandler(err);
-      console.log('getCategory', error);
-      res.status(error.code).json(error.message);
+      res.status(error.code).json(error);
     });
 };
 
@@ -88,12 +88,17 @@ export const update = (req: express.Request, res: express.Response): void => {
       return getCategory(req.body.id);
     })
     .then((result) => {
+      if (!result) {
+        throw new InternalError(
+          `Category with id '${req.body.id}' not found`,
+          'ObjectNotFound'
+        );
+      }
       res.status(202).json(result);
     })
     .catch((err) => {
       const error = errorHandler(err);
-      console.log('updateCategory', error);
-      res.status(error.code).json(error.message);
+      res.status(error.code).json(error);
     });
 };
 

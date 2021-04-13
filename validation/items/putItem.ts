@@ -1,18 +1,8 @@
-export const PutItemSchema = {
-  type: 'object',
-  required: ['id', 'price', 'name', 'categoryId'],
-  properties: {
-    id: {
-      type: 'string',
-    },
-    price: {
-      type: 'number',
-    },
-    name: {
-      type: 'string',
-    },
-    categoryId: {
-      type: 'string',
-    },
-  },
-};
+import Joi from 'joi';
+
+export const PutItemSchema: Joi.ObjectSchema = Joi.object().keys({
+  id: Joi.string().required(),
+  price: Joi.number().min(0).required(),
+  name: Joi.string().required(),
+  categoryId: Joi.string().required(),
+});

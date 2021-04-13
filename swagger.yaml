@@ -34,10 +34,16 @@ paths:
                   $ref: "#/components/schemas/item"
         "400":
           description: Bad request
-        "404":
-          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "500":
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     post:
       summary: Add a new item to the store
       tags:
@@ -74,14 +80,30 @@ paths:
             schema:
               $ref: "#/components/schemas/putItem"
       responses:
-        "200":
+        "202":
           description: OK
+          content:
+            document:
+              schema:
+                $ref: "#/components/schemas/item"
         "400":
           description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "404":
           description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "500":
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
   "/items/{id}":
     get:
       summary: Get one item
@@ -104,10 +126,22 @@ paths:
                 $ref: "#/components/schemas/item"
         "400":
           description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "404":
           description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
         "500":
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     delete:
       summary: Delete an existing item
       tags:
@@ -121,8 +155,13 @@ paths:
             type: string
             example: 60643ec32935b839bc005adc
       responses:
-        "200":
+        "202":
           description: OK
+          content:
+            document:
+              schema:
+                type: string
+                example: "Item was deleted"
         "400":
           description: Bad request
         "404":
@@ -143,12 +182,12 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/category"
-        "400":
-          description: Bad request
-        "404":
-          description: Not Found
         "500":
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
     post:
       summary: Add a new category to the store
       tags:
@@ -316,3 +355,12 @@ components:
         name:
           type: string
           example: Mascara
+    Error:
+      type: object
+      properties:
+        code:
+          type: number
+        name:
+          type: string
+        message:
+          type: string

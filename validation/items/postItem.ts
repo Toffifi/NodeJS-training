@@ -1,15 +1,7 @@
-export const PostItemSchema = {
-  type: 'object',
-  required: ['price', 'name', 'categoryId'],
-  properties: {
-    price: {
-      type: 'number',
-    },
-    name: {
-      type: 'string',
-    },
-    categoryId: {
-      type: 'string',
-    },
-  },
-};
+import Joi from 'joi';
+
+export const PostItemSchema: Joi.ObjectSchema = Joi.object().keys({
+  price: Joi.number().min(0).required(),
+  name: Joi.string().required(),
+  categoryId: Joi.string().required(),
+});
