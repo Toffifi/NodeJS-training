@@ -1,7 +1,7 @@
 import express from 'express';
 import { Item, ItemUpdate } from '../interfaces';
 import ItemModel from '../models/item';
-import mongoose from 'mongoose';
+import { errorHandler } from '../utils';
 
 export const getAll = (req: express.Request, res: express.Response): void => {
   const query: { isDeleted: boolean; categoryId?: string } = {
@@ -20,8 +20,9 @@ export const getAll = (req: express.Request, res: express.Response): void => {
       res.status(200).json(result);
     })
     .catch((err) => {
-      console.log('get', err);
-      // res.status(err.code).json(err.message);
+      const error = errorHandler(err);
+      console.log('getAllItem', error);
+      res.status(error.code).json(error.message);
     });
 };
 
@@ -37,9 +38,10 @@ export const create = (req: express.Request, res: express.Response): void => {
     .then((result) => {
       res.status(201).json(result);
     })
-    .catch((err: mongoose.Error) => {
-      console.log('controller', err.name);
-      // res.status(err.code).json(err.message);
+    .catch((err) => {
+      const error = errorHandler(err);
+      console.log('createItem', error);
+      res.status(error.code).json(error.message);
     });
 };
 
@@ -56,9 +58,10 @@ export const remove = (req: express.Request, res: express.Response): void => {
     .then(() => {
       res.status(202).json('Item was deleted');
     })
-    .catch((err: mongoose.Error) => {
-      console.log('controller', err.name);
-      // res.status(err.code).json(err.message);
+    .catch((err) => {
+      const error = errorHandler(err);
+      console.log('removeItem', error);
+      res.status(error.code).json(error.message);
     });
 };
 
@@ -68,8 +71,9 @@ export const get = (req: express.Request, res: express.Response): void => {
       res.status(200).json(result);
     })
     .catch((err) => {
-      console.log('get', err);
-      // res.status(err.code).json(err.message);
+      const error = errorHandler(err);
+      console.log('getItem', error);
+      res.status(error.code).json(error.message);
     });
 };
 
@@ -94,9 +98,10 @@ export const update = (req: express.Request, res: express.Response): void => {
     .then((result) => {
       res.status(202).json(result);
     })
-    .catch((err: mongoose.Error) => {
-      console.log('controller', err.name);
-      // res.status(err.code).json(err.message);
+    .catch((err) => {
+      const error = errorHandler(err);
+      console.log('updateItem', error);
+      res.status(error.code).json(error.message);
     });
 };
 

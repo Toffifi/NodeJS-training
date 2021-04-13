@@ -1,12 +1,8 @@
-import { Collections } from '../enums/collections';
-import { ConflictError } from '../errors';
 import express from 'express';
+import { errorHandler } from '../utils';
 import { Category } from '../interfaces';
-import { FilterQuery, MatchKeysAndValues, ObjectId, OptionalId } from 'mongodb';
 
-import * as dbClient from '../services/makeupStoreClient';
-import CategoryModel from 'models/category';
-import mongoose from 'mongoose';
+import CategoryModel from '../models/category';
 
 export const getAll = (req: express.Request, res: express.Response): void => {
   CategoryModel.find({
@@ -17,8 +13,9 @@ export const getAll = (req: express.Request, res: express.Response): void => {
       res.status(200).json(result);
     })
     .catch((err) => {
-      console.log('get', err);
-      // res.status(err.code).json(err.message);
+      const error = errorHandler(err);
+      console.log('getAllCategory', error);
+      res.status(error.code).json(error.message);
     });
 };
 
@@ -36,9 +33,10 @@ export const create = async (
     .then((result) => {
       res.status(201).json(result);
     })
-    .catch((err: mongoose.Error) => {
-      console.log('controller', err.name);
-      // res.status(err.code).json(err.message);
+    .catch((err) => {
+      const error = errorHandler(err);
+      console.log('createCategory', error);
+      res.status(error.code).json(error.message);
     });
 };
 
@@ -55,9 +53,10 @@ export const remove = (req: express.Request, res: express.Response): void => {
     .then(() => {
       res.status(202).json('Item was deleted');
     })
-    .catch((err: mongoose.Error) => {
-      console.log('controller', err.name);
-      // res.status(err.code).json(err.message);
+    .catch((err) => {
+      const error = errorHandler(err);
+      console.log('removeCategory', error);
+      res.status(error.code).json(error.message);
     });
 };
 
@@ -67,8 +66,9 @@ export const get = (req: express.Request, res: express.Response): void => {
       res.status(200).json(result);
     })
     .catch((err) => {
-      console.log('get', err);
-      // res.status(err.code).json(err.message);
+      const error = errorHandler(err);
+      console.log('getCategory', error);
+      res.status(error.code).json(error.message);
     });
 };
 
@@ -90,9 +90,10 @@ export const update = (req: express.Request, res: express.Response): void => {
     .then((result) => {
       res.status(202).json(result);
     })
-    .catch((err: mongoose.Error) => {
-      console.log('controller', err.name);
-      // res.status(err.code).json(err.message);
+    .catch((err) => {
+      const error = errorHandler(err);
+      console.log('updateCategory', error);
+      res.status(error.code).json(error.message);
     });
 };
 
