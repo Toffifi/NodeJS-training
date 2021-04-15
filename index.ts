@@ -4,7 +4,7 @@ import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 
 import router from './routes';
-import * as mongoClient from './services/makeupStoreClient';
+import * as mongoClient from './services/mongo';
 
 const swaggerDocument = YAML.load('./swagger.yaml');
 

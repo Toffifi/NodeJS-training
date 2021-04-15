@@ -1,144 +1,136 @@
 import express from 'express';
 
-import { InternalError } from '../errors';
+import { NotFoundError } from '../utils/errors';
 import { Item, ItemUpdate } from '../interfaces';
 import CategoryModel from '../models/category';
 import ItemModel from '../models/item';
 import errorHandler from '../utils/errorHandler';
 
-export const getAll = (req: express.Request, res: express.Response): void => {
-  const query: { isDeleted: boolean; categoryId?: string } = {
-    isDeleted: false,
-  };
-
-  const categoryId: string = req.query.categoryId?.toString();
-
-  if (categoryId) {
-    query.categoryId = categoryId;
-  }
-
-  checkCategory(categoryId)
-    .then((result) => {
-      if (!result) {
-        throw new InternalError(
-          `Category ${req.body.categoryId} not found`,
-          'ObjectNotFound'
-        );
-      }
-      return ItemModel.find(query).exec();
-    })
-    .then((result) => {
-      res.status(200).json(result);
-    })
-    .catch((err) => {
-      const error = errorHandler(err);
-      res.status(error.code).json(error);
-    });
-};
-
-export const create = (req: express.Request, res: express.Response): void => {
-  checkCategory(req.body.categoryId)
-    .then((result) => {
-      if (!result) {
-        throw new InternalError(
-          `Category ${req.body.categoryId} not found`,
-          'ObjectNotFound'
-        );
-      }
-      const item: Item = new ItemModel({
-        name: req.body.name,
-        categoryId: req.body.categoryId,
-        price: req.body.price,
-        isDeleted: false,
-      });
-      return item.save();
-    })
-    .then((result) => {
-      res.status(201).json(result);
-    })
-    .catch((err) => {
-      const error = errorHandler(err);
-      res.status(error.code).json(error);
-    });
-};
-
-export const remove = (req: express.Request, res: express.Response): void => {
-  ItemModel.updateOne(
-    {
-      _id: req.params.id,
+export const getAll = async (
+  req: express.Request,
+  res: express.Response
+): Promise<void> => {
+  try {
+    const query: { isDeleted: boolean; categoryId?: string } = {
       isDeleted: false,
-    },
-    {
-      isDeleted: true,
+    };
+
+    const categoryId: string = req.query.categoryId?.toString();
+
+    if (categoryId) {
+      const isValidCategory = await checkCategory(categoryId);
+      if (!isValidCategory) {
+        throw new NotFoundError(`Category ${req.body.categoryId} not found`);
+      }
+      query.categoryId = categoryId;
     }
-  )
-    .then(() => {
-      res.status(202).json('Item was deleted');
-    })
-    .catch((err) => {
-      const error = errorHandler(err);
-      res.status(error.code).json(error);
-    });
+
+    const result = await ItemModel.find(query).exec();
+    res.status(200).json(result);
+  } catch (err) {
+    const error = errorHandler(err);
+    res.status(error.code).json(error);
+  }
 };
 
-export const get = (req: express.Request, res: express.Response): void => {
-  getItem(req.params.id)
-    .then((result) => {
-      if (!result) {
-        throw new InternalError(
-          `Item with id '${req.body.id}' not found`,
-          'ObjectNotFound'
-        );
-      }
-      res.status(200).json(result);
-    })
-    .catch((err) => {
-      const error = errorHandler(err);
-      res.status(error.code).json(error);
+export const create = async (
+  req: express.Request,
+  res: express.Response
+): Promise<void> => {
+  try {
+    const isValidCategory = await checkCategory(req.body.categoryId);
+
+    if (!isValidCategory) {
+      throw new NotFoundError(`Category ${req.body.categoryId} not found`);
+    }
+
+    const item: Item = new ItemModel({
+      name: req.body.name,
+      categoryId: req.body.categoryId,
+      price: req.body.price,
+      isDeleted: false,
     });
+    const result = await item.save();
+
+    res.status(201).json(result);
+  } catch (err) {
+    const error = errorHandler(err);
+    res.status(error.code).json(error);
+  }
 };
 
-export const update = (req: express.Request, res: express.Response): void => {
-  checkCategory(req.body.categoryId)
-    .then((result) => {
-      if (!result) {
-        throw new InternalError(
-          `Category with id '${req.body.categoryId}' not found`,
-          'ObjectNotFound'
-        );
-      }
-    })
-    .then(() => {
-      const updatedItem: ItemUpdate = {
-        name: req.body.name,
-        categoryId: req.body.categoryId,
-        price: req.body.price,
+export const remove = async (
+  req: express.Request,
+  res: express.Response
+): Promise<void> => {
+  try {
+    await ItemModel.updateOne(
+      {
+        _id: req.params.id,
         isDeleted: false,
-      };
-      return ItemModel.updateOne(
-        {
-          _id: req.body.id,
-          isDeleted: false,
-        },
-        updatedItem
-      );
-    })
-    .then(() => {
-      return getItem(req.body.id);
-    })
-    .then((result) => {
-      if (!result) {
-        throw new InternalError(
-          `Item with id '${req.body.id}' not found`,
-          'ObjectNotFound'
-        );
+      },
+      {
+        isDeleted: true,
       }
-      res.status(202).json(result);
-    })
-    .catch((err) => {
-      const error = errorHandler(err);
-      res.status(error.code).json(error);
-    });
+    );
+    res.status(202).json('Item was deleted');
+  } catch (err) {
+    const error = errorHandler(err);
+    res.status(error.code).json(error);
+  }
+};
+
+export const get = async (
+  req: express.Request,
+  res: express.Response
+): Promise<void> => {
+  try {
+    const result = await getItem(req.params.id);
+    if (!result) {
+      throw new NotFoundError(`Item with id '${req.body.id}' not found`);
+    }
+    res.status(200).json(result);
+  } catch (err) {
+    const error = errorHandler(err);
+    res.status(error.code).json(error);
+  }
+};
+
+export const update = async (
+  req: express.Request,
+  res: express.Response
+): Promise<void> => {
+  try {
+    const isValidCategory = await checkCategory(req.body.categoryId);
+    if (!isValidCategory) {
+      throw new NotFoundError(
+        `Category with id '${req.body.categoryId}' not found`
+      );
+    }
+
+    const itemParams: ItemUpdate = {
+      name: req.body.name,
+      categoryId: req.body.categoryId,
+      price: req.body.price,
+      isDeleted: false,
+    };
+    await ItemModel.updateOne(
+      {
+        _id: req.body.id,
+        isDeleted: false,
+      },
+      itemParams
+    );
+
+    const updatedItem = await getItem(req.body.id);
+    if (!updatedItem) {
+      throw new NotFoundError(`Item with id '${req.body.id}' not found`);
+    }
+    res.status(202).json(updatedItem);
+  } catch (err) {
+    const error = errorHandler(err);
+    res.status(error.code).json(error);
+  }
 };
 
 const getItem = (id: string): Promise<Item> => {
@@ -149,10 +141,8 @@ const getItem = (id: string): Promise<Item> => {
 };
 
 const checkCategory = (id: string): Promise<boolean> => {
-  return id
-    ? CategoryModel.exists({
-        _id: id,
-        isDeleted: false,
-      })
-    : new Promise(() => true);
+  return CategoryModel.exists({
+    _id: id,
+    isDeleted: false,
+  });
 };
