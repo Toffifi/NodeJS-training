@@ -1,11 +1,10 @@
-export interface CustomError {
-  message: string;
-  name: string;
-}
-
-export class NotFoundError extends Error implements CustomError {
+import { CustomError } from './customError';
+export class NotFoundError extends CustomError {
   constructor(message: string) {
-    super(message);
-    this.name = 'ObjectNotFound';
+    super();
+    this.message = message;
+    this.name = 'NOT_FOUND';
   }
+
+  code: number = 404;
 }

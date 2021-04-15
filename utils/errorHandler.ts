@@ -1,7 +1,6 @@
 import mongoDb from 'mongoDb';
 
 import { ApiError } from '../interfaces';
-import { NotFoundError } from './errors/NotFoundError';
 
 export default function errorHandler(error: Error): ApiError {
   let newError: ApiError = {
@@ -9,8 +8,6 @@ export default function errorHandler(error: Error): ApiError {
     name: null,
     message: error.message,
   };
-
-  console.log(error instanceof NotFoundError);
 
   switch (error.name) {
     case 'MongooseError':
@@ -23,11 +20,6 @@ export default function errorHandler(error: Error): ApiError {
     case 'ValidationError':
       newError.code = 400;
       newError.name = 'BAD_REQUEST';
-      break;
-
-    case 'ObjectNotFound':
-      newError.code = 404;
-      newError.name = 'NOT_FOUND';
       break;
 
     case 'MongoError':

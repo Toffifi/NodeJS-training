@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { NotFoundError } from '../utils/errors';
+import { CustomError, NotFoundError } from '../utils/errors';
 import { Category } from '../interfaces';
 import CategoryModel from '../models/category';
 import errorHandler from '../utils/errorHandler';
@@ -13,8 +13,12 @@ export const getAll = async (
     const result = await CategoryModel.find({ isDeleted: false }).exec();
     res.status(200).json(result);
   } catch (err) {
-    const error = errorHandler(err);
-    res.status(error.code).json(error);
+    if (err instanceof CustomError) {
+      res.status(err.code).json(err);
+    } else {
+      const error = errorHandler(err);
+      res.status(error.code).json(error);
+    }
   }
 };
 
@@ -31,8 +35,12 @@ export const create = async (
     const result = await category.save();
     res.status(201).json(result);
   } catch (err) {
-    const error = errorHandler(err);
-    res.status(error.code).json(error);
+    if (err instanceof CustomError) {
+      res.status(err.code).json(err);
+    } else {
+      const error = errorHandler(err);
+      res.status(error.code).json(error);
+    }
   }
 };
 
@@ -52,8 +60,12 @@ export const remove = async (
     );
     res.status(202).json('Item was deleted');
   } catch (err) {
-    const error = errorHandler(err);
-    res.status(error.code).json(error);
+    if (err instanceof CustomError) {
+      res.status(err.code).json(err);
+    } else {
+      const error = errorHandler(err);
+      res.status(error.code).json(error);
+    }
   }
 };
 
@@ -68,8 +80,12 @@ export const get = async (
     }
     res.status(200).json(result);
   } catch (err) {
-    const error = errorHandler(err);
-    res.status(error.code).json(error);
+    if (err instanceof CustomError) {
+      res.status(err.code).json(err);
+    } else {
+      const error = errorHandler(err);
+      res.status(error.code).json(error);
+    }
   }
 };
 
@@ -96,8 +112,12 @@ export const update = async (
     }
     res.status(202).json(updatedCategory);
   } catch (err) {
-    const error = errorHandler(err);
-    res.status(error.code).json(error);
+    if (err instanceof CustomError) {
+      res.status(err.code).json(err);
+    } else {
+      const error = errorHandler(err);
+      res.status(error.code).json(error);
+    }
   }
 };
 
